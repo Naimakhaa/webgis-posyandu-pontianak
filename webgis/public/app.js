@@ -80,6 +80,23 @@ function popupHtml(p) {
     '</dl></div>';
 }
 
+function tampilkanDetail(f, kat) {
+  const p = f.properties;
+  const lng = f.geometry.coordinates[0];
+  const lat = f.geometry.coordinates[1];
+
+  document.getElementById('detail-body').innerHTML =
+    '<h3>' + escapeHtml(p.nama) + '</h3>' +
+    '<dl>' +
+    '<dt>Kode</dt><dd>' + escapeHtml(p.kode_posyandu) + '</dd>' +
+    '<dt>Layanan</dt><dd><span class="badge" style="background:' + COLORS[kat] + '"></span>' + escapeHtml(p.layanan) + '</dd>' +
+    '<dt>Jadwal</dt><dd>' + escapeHtml(p.jadwal) + '</dd>' +
+    '<dt>Tenaga kesehatan</dt><dd>' + escapeHtml(p.tenaga_kesehatan) + ' orang</dd>' +
+    '<dt>Biaya</dt><dd>' + (isGratis(p.gratis) ? 'Gratis' : 'Berbayar') + '</dd>' +
+    '<dt>Koordinat</dt><dd>' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '</dd>' +
+    '</dl>';
+}
+
 // ---------- RENDER ----------
 function renderPosyandu() {
   plainLayer.clearLayers();
@@ -110,7 +127,10 @@ function renderPosyandu() {
       weight: 2,
       fillColor: COLORS[kat],
       fillOpacity: 0.95
-    }).bindPopup(popupHtml(f.properties));
+        }).bindPopup(popupHtml(f.properties));
+    marker.on('click', function () {
+      tampilkanDetail(f, kat);
+    });
 
     target.addLayer(marker);
     tampil++;
