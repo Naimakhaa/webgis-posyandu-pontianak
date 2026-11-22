@@ -1,0 +1,136 @@
+:root {
+  --imunisasi: #d64545;
+  --gizi: #2f9e5b;
+  --kb: #2f6fb5;
+  --lainnya: #e0951f;
+  --ink: #1f2a30;
+  --muted: #5d6b73;
+  --line: #d9e0e3;
+  --bg: #f6f8f8;
+  --cluster: #3b4a54;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  color: var(--ink);
+}
+
+body {
+  display: flex;
+}
+
+#panel {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-right: 1px solid var(--line);
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#panel h1 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin: 0 0 4px;
+}
+
+#panel header p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+#panel h2 {
+  font-size: 0.9375rem;
+  margin: 0 0 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.row input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.row input:focus-visible {
+  outline: 2px solid var(--kb);
+  outline-offset: 2px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--line);
+  flex-shrink: 0;
+}
+
+.name { flex: 1; }
+
+.count {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+footer {
+  margin-top: auto;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+#info { color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+
+#map {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+/* Ikon cluster (L.divIcon) */
+.cluster-icon {
+  background: var(--cluster);
+  color: #fff;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* Popup */
+.popup h3 { margin: 0 0 6px; font-size: 1rem; }
+.popup dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 0.875rem; }
+.popup dt { color: var(--muted); }
+.popup dd { margin: 0; }
+
+@media (max-width: 720px) {
+  body { flex-direction: column-reverse; }
+  #panel {
+    width: 100%;
+    max-height: 42vh;
+    border-right: 0;
+    border-top: 1px solid var(--line);
+  }
+  #map { height: 58vh; flex: none; }
+}
