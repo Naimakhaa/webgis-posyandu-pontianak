@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIG Posyandu Pontianak Timur</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside id="panel">
+    <header>
+      <h1>Posyandu Pontianak Timur</h1>
+      <p>Sebaran layanan kesehatan ibu dan anak</p>
+    </header>
+
+    <section>
+      <h2>Filter layanan</h2>
+      <label class="row">
+        <input type="checkbox" data-key="imunisasi" checked>
+        <span class="dot" style="background:var(--imunisasi)"></span>
+        <span class="name">Imunisasi</span>
+        <span class="count" id="count-imunisasi">0</span>
+      </label>
+      <label class="row">
+        <input type="checkbox" data-key="gizi" checked>
+        <span class="dot" style="background:var(--gizi)"></span>
+        <span class="name">Gizi</span>
+        <span class="count" id="count-gizi">0</span>
+      </label>
+      <label class="row">
+        <input type="checkbox" data-key="kb" checked>
+        <span class="dot" style="background:var(--kb)"></span>
+        <span class="name">KB</span>
+        <span class="count" id="count-kb">0</span>
+      </label>
+      <label class="row">
+        <input type="checkbox" data-key="lainnya" checked>
+        <span class="dot" style="background:var(--lainnya)"></span>
+        <span class="name">Lainnya</span>
+        <span class="count" id="count-lainnya">0</span>
+      </label>
+    </section>
+
+    <section>
+      <h2>Tampilan</h2>
+      <label class="row">
+        <input type="checkbox" id="chkCluster">
+        <span class="name">Kelompokkan titik berdekatan (cluster)</span>
+      </label>
+    </section>
+
+    <footer>
+      <div id="info">Memuat data...</div>
+      <div id="source"></div>
+    </footer>
+  </aside>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
