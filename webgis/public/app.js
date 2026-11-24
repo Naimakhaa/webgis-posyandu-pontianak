@@ -286,7 +286,7 @@ const LAYER_DEFS = [
   {
     nama: 'Zona Layanan',
     swatch: '<span class="sw sw-area" style="border-color:#1c8c8c;background:rgba(28,140,140,.2)"></span>',
-    url: 'data/zona_layanan.geojson',
+    url: 'api/data/zona',
     aktif: true,
     opsi: { pane: 'pZona',
             style: { color: '#1c8c8c', weight: 2, fillColor: '#1c8c8c', fillOpacity: 0.18 },
