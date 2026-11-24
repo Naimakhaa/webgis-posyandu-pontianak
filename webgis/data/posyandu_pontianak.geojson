@@ -1,9 +1,0 @@
-{
-  "type": "FeatureCollection",
-  "name": "CONTOH - ganti dengan hasil ekspor SK-2 (40 titik)",
-  "features": [
-    {"type":"Feature","properties":{"nama":"Posyandu Contoh 1","layanan":"Imunisasi","jadwal":"Senin","tenaga_kesehatan":3,"gratis":"Ya","kode_posyandu":"POS_Senin"},"geometry":{"type":"Point","coordinates":[109.3425,-0.0263]}},
-    {"type":"Feature","properties":{"nama":"Posyandu Contoh 2","layanan":"Gizi","jadwal":"Selasa","tenaga_kesehatan":2,"gratis":"Ya","kode_posyandu":"POS_Selasa"},"geometry":{"type":"Point","coordinates":[109.3330,-0.0400]}},
-    {"type":"Feature","properties":{"nama":"Posyandu Contoh 3","layanan":"KB","jadwal":"Rabu","tenaga_kesehatan":4,"gratis":"Tidak","kode_posyandu":"POS_Rabu"},"geometry":{"type":"Point","coordinates":[109.3600,-0.0150]}}
-  ]
-}
