@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIG Posyandu Pontianak</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="topbar">
+    <h1><span aria-hidden="true">🗺️</span> Peta Posyandu Kota Pontianak</h1>
+    <p>Layanan Kesehatan Ibu dan Anak</p>
+  </header>
+
+  <div id="main">
+  <aside id="panel">
+
+    <section class="stat">
+      <h2>Statistik Layanan</h2>
+      <div class="row"><span class="dot" style="background:var(--imunisasi)"></span><span class="name">Imunisasi</span><span class="count" id="count-imunisasi">0</span></div>
+      <div class="row"><span class="dot" style="background:var(--gizi)"></span><span class="name">Gizi</span><span class="count" id="count-gizi">0</span></div>
+      <div class="row"><span class="dot" style="background:var(--kb)"></span><span class="name">KB</span><span class="count" id="count-kb">0</span></div>
+      <div class="row"><span class="dot" style="background:var(--lainnya)"></span><span class="name">Lainnya</span><span class="count" id="count-lainnya">0</span></div>
+    </section>
+
+    <section>
+      <h2>Filter Layanan</h2>
+      <label class="row"><input type="checkbox" data-key="imunisasi" checked><span class="name">Imunisasi</span></label>
+      <label class="row"><input type="checkbox" data-key="gizi" checked><span class="name">Gizi</span></label>
+      <label class="row"><input type="checkbox" data-key="kb" checked><span class="name">KB</span></label>
+      <label class="row"><input type="checkbox" data-key="lainnya" checked><span class="name">Lainnya</span></label>
+      <button type="button" id="btnReset">Reset Semua Filter</button>
+    </section>
+
+    <section>
+      <h2>Kontrol Peta</h2>
+      <label class="row"><input type="checkbox" id="chkLabel"><span class="name">Tampilkan label fasilitas</span></label>
+      <label class="row"><input type="checkbox" id="chkCluster"><span class="name">Gabungkan titik berdekatan</span></label>
+      <div id="label-info" class="catatan"></div>
+    </section>
+
+    <section class="legend">
+      <h2>Legenda</h2>
+      <div class="row"><span class="dot" style="background:var(--imunisasi)"></span><span class="name">Imunisasi</span></div>
+      <div class="row"><span class="dot" style="background:var(--gizi)"></span><span class="name">Gizi</span></div>
+      <div class="row"><span class="dot" style="background:var(--kb)"></span><span class="name">KB</span></div>
+      <div class="row"><span class="dot" style="background:var(--lainnya)"></span><span class="name">Lainnya</span></div>
+    </section>
+
+    <section id="detail">
+      <h2>Detail lokasi</h2>
+      <div id="detail-body">Klik salah satu titik di peta untuk melihat informasinya.</div>
+    </section>
+
+    <footer>
+      <div id="info">Memuat data...</div>
+      <div id="source"></div>
+      <div id="layer-info"></div>
+    </footer>
+  </aside>
+
+  <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
