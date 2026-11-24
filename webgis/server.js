@@ -4,25 +4,33 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const FILE_POSYANDU = path.join(__dirname, 'data', 'posyandu_pontianak.geojson');
 const FILE_ZONA = path.join(__dirname, 'data', 'zona_layanan.geojson');
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Fungsi bantu: baca file GeoJSON
 function bacaGeojson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-// Cek saat server mulai: file Posyandu harus berisi titik (Point)
-const cek = bacaGeojson(FILE_POSYANDU).features.filter((f) => f.geometry.type !== 'Point');
-if (cek.length > 0) {
-  console.warn('PERINGATAN: posyandu_pontianak.geojson berisi ' + cek.length + ' fitur bukan Point. Minta SK-2 ekspor ulang layer titik.');
+// Cek saat server mulai: kedua file data harus ada
+[FILE_POSYANDU, FILE_ZONA].forEach((file) => {
+  if (!fs.existsSync(file)) {
+    console.error('File data tidak ditemukan: ' + file);
+    process.exit(1);
+  }
+});
+
+// Peringatan jika file Posyandu berisi fitur yang bukan Point
+const bukanTitik = bacaGeojson(FILE_POSYANDU).features.filter((f) => f.geometry.type !== 'Point');
+if (bukanTitik.length > 0) {
+  console.warn('PERINGATAN: ' + bukanTitik.length + ' fitur di posyandu_pontianak.geojson bukan Point.');
 }
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public'))); // frontend SK-4
 
 // 1. GET /api/data/posyandu -> semua titik Posyandu
 app.get('/api/data/posyandu', (req, res) => {
@@ -41,7 +49,7 @@ app.get('/api/stats/layanan', (req, res) => {
   res.json({ total: data.features.length, stats });
 });
 
-// 3a. GET /api/data/zona -> poligon zona layanan (untuk layer peta SK-4)
+// 3a. GET /api/data/zona -> poligon zona layanan
 app.get('/api/data/zona', (req, res) => {
   res.json(bacaGeojson(FILE_ZONA));
 });
