@@ -1,5 +1,5 @@
 // =====================================================
-// SK-4 Frontend Interaktif - SIG Posyandu Pontianak Timur
+// SK-4 Frontend Interaktif - SIG Posyandu Kota Pontianak
 // =====================================================
 
 // ---------- STATE ----------
@@ -9,9 +9,10 @@ const state = {
 };
 
 // ---------- KONFIGURASI ----------
-// Data posyandu: diambil dari API (SK-3). Jika API belum ada, memakai file sementara.
+// Data posyandu: mencoba ambil dari API (SK-3).
+// Jika API belum siap/belum dijalankan, otomatis memakai file GeoJSON asli di public/data/.
 const API_URL = '/api/data/posyandu';
-const DUMMY_URL = 'data/posyandu_dummy.geojson';
+const FALLBACK_URL = 'data/posyandu_pontianak.geojson';
 
 const COLORS = {
   imunisasi: '#d64545',
@@ -31,7 +32,7 @@ const LABEL_MIN_NAKES = 0;
 let daftarLabel = [];
 
 // ---------- PETA ----------
-const map = L.map('map').setView([-0.0263, 109.3708], 12);
+const map = L.map('map').setView([-0.0263, 109.3425], 12);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -90,30 +91,11 @@ function popupHtml(p) {
     '<dt>Jadwal</dt><dd>' + escapeHtml(p.jadwal) + '</dd>' +
     '<dt>Tenaga kesehatan</dt><dd>' + escapeHtml(p.tenaga_kesehatan) + ' orang</dd>' +
     '<dt>Biaya</dt><dd>' + (isGratis(p.gratis) ? 'Gratis' : 'Berbayar') + '</dd>' +
+    barisOpsional(p, 'kecamatan', 'Kecamatan') +
     barisOpsional(p, 'kelurahan', 'Kelurahan') +
     barisOpsional(p, 'puskesmas', 'Puskesmas') +
     barisOpsional(p, 'alamat', 'Alamat') +
     '</dl></div>';
-}
-
-function tampilkanDetail(f, kat) {
-  const p = f.properties;
-  const lng = f.geometry.coordinates[0];
-  const lat = f.geometry.coordinates[1];
-
-  document.getElementById('detail-body').innerHTML =
-    '<h3>' + escapeHtml(p.nama) + '</h3>' +
-    '<dl>' +
-    barisOpsional(p, 'kode_posyandu', 'Kode') +
-    '<dt>Layanan</dt><dd><span class="badge" style="background:' + COLORS[kat] + '"></span>' + escapeHtml(p.layanan) + '</dd>' +
-    '<dt>Jadwal</dt><dd>' + escapeHtml(p.jadwal) + '</dd>' +
-    '<dt>Tenaga kesehatan</dt><dd>' + escapeHtml(p.tenaga_kesehatan) + ' orang</dd>' +
-    '<dt>Biaya</dt><dd>' + (isGratis(p.gratis) ? 'Gratis' : 'Berbayar') + '</dd>' +
-    barisOpsional(p, 'kelurahan', 'Kelurahan') +
-    barisOpsional(p, 'puskesmas', 'Puskesmas') +
-    barisOpsional(p, 'alamat', 'Alamat') +
-    '<dt>Koordinat</dt><dd>' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '</dd>' +
-    '</dl>';
 }
 
 // ---------- RENDER POSYANDU ----------
@@ -149,8 +131,6 @@ function renderPosyandu() {
       fillOpacity: 0.95
     }).bindPopup(popupHtml(f.properties));
 
-    marker.on('click', function () { tampilkanDetail(f, kat); });
-
     if (tampilLabel && Number(f.properties.tenaga_kesehatan) >= LABEL_MIN_NAKES) {
       marker.bindTooltip(escapeHtml(namaLabel(f.properties.nama)), {
         permanent: true,
@@ -177,7 +157,7 @@ function renderPosyandu() {
   document.getElementById('info').textContent =
     'Menampilkan ' + tampil + ' dari ' + allFeatures.length + ' posyandu';
 
-  // beri waktu agar label (dan cluster) selesai digambar, lalu rapikan
+  // Beri waktu agar label (dan cluster) selesai digambar, lalu rapikan
   setTimeout(aturLabel, 80);
 }
 
@@ -195,42 +175,14 @@ function tabrakan(a, b) {
 // Label dengan tenaga kesehatan lebih banyak diutamakan. Zoom lebih dekat = lebih banyak label tampil.
 function aturLabel() {
   const info = document.getElementById('label-info');
-  if (!tampilLabel || !daftarLabel.length) { info.textContent = ''; return; }
+  info.textContent = '';
 
-  const peta = map.getContainer().getBoundingClientRect();
-  const kotakTitik = daftarLabel.map(function (d) {
-    const p = map.latLngToContainerPoint(d.marker.getLatLng());
-    return { x: p.x - 10, y: p.y - 10, w: 20, h: 20 };
-  });
-
-  const urut = daftarLabel
-    .map(function (d, i) { return { d: d, i: i }; })
-    .sort(function (x, y) { return y.d.prioritas - x.d.prioritas; });
-
-  const terpakai = [];
-  let tampil = 0;
-  let total = 0;
-
-  urut.forEach(function (o) {
-    const tt = o.d.marker.getTooltip();
+  // Pastikan semua label tetap tampil tanpa disembunyikan
+  daftarLabel.forEach(function (d) {
+    const tt = d.marker.getTooltip();
     const el = tt && tt.getElement();
-    if (!el || !o.d.marker._map) return;          // titik sedang tergabung dalam cluster
-    total++;
-
-    const r = el.getBoundingClientRect();
-    const kotak = { x: r.left - peta.left, y: r.top - peta.top, w: r.width, h: r.height };
-
-    const bentrok =
-      terpakai.some(function (k) { return tabrakan(k, kotak); }) ||
-      kotakTitik.some(function (k, j) { return j !== o.i && tabrakan(k, kotak); });
-
-    el.classList.toggle('label-sembunyi', bentrok);
-    if (!bentrok) { terpakai.push(kotak); tampil++; }
+    if (el) el.classList.remove('label-sembunyi');
   });
-
-  info.textContent = tampil < total
-    ? tampil + ' dari ' + total + ' label tampil. Perbesar peta atau arahkan kursor ke titik untuk melihat nama lainnya.'
-    : '';
 }
 
 function hitungPerKategori() {
@@ -256,43 +208,52 @@ const LAYER_DEFS = [
     swatch: '<span class="sw sw-putus" style="border-color:#3b4a54"></span>',
     url: 'data/batas_kec_pontianak.geojson',
     aktif: true,
-    opsi: { pane: 'pBatas', interactive: false,
-            style: { color: '#3b4a54', weight: 2, dashArray: '6 4', fill: false } }
+    opsi: {
+      pane: 'pBatas',
+      interactive: false,
+      style: { color: '#3b4a54', weight: 2, dashArray: '6 4', fill: false }
+    }
   },
   {
     nama: 'Jalan Utama',
     swatch: '<span class="sw sw-garis" style="border-color:#c9822b"></span>',
     url: 'data/jalan_utama.geojson',
     aktif: true,
-    opsi: { pane: 'pJalan',
-            style: function (f) {
-              return { color: '#c9822b', weight: lebarJalan(f.properties.highway), opacity: 0.85 };
-            },
-            onEachFeature: function (f, layer) {
-              if (f.properties.name) layer.bindTooltip(escapeHtml(f.properties.name), { sticky: true });
-            } }
+    opsi: {
+      pane: 'pJalan',
+      style: function (f) {
+        return { color: '#c9822b', weight: lebarJalan(f.properties.highway), opacity: 0.85 };
+      },
+      onEachFeature: function (f, layer) {
+        if (f.properties.name) layer.bindTooltip(escapeHtml(f.properties.name), { sticky: true });
+      }
+    }
   },
   {
     nama: 'Permukiman',
     swatch: '<span class="sw sw-area" style="border-color:#7e5fa8;background:rgba(126,95,168,.25)"></span>',
     url: 'data/permukiman.geojson',
     aktif: true,
-    opsi: { pane: 'pPermukiman',
-            style: { color: '#7e5fa8', weight: 1, fillColor: '#9b7fbf', fillOpacity: 0.3 },
-            onEachFeature: function (f, layer) {
-              layer.bindTooltip(escapeHtml(f.properties.name || 'Permukiman'), { sticky: true });
-            } }
+    opsi: {
+      pane: 'pPermukiman',
+      style: { color: '#7e5fa8', weight: 1, fillColor: '#9b7fbf', fillOpacity: 0.3 },
+      onEachFeature: function (f, layer) {
+        layer.bindTooltip(escapeHtml(f.properties.name || 'Permukiman'), { sticky: true });
+      }
+    }
   },
   {
     nama: 'Zona Layanan',
     swatch: '<span class="sw sw-area" style="border-color:#1c8c8c;background:rgba(28,140,140,.2)"></span>',
-    url: 'data/zona_layanan.geojson',
+    url: 'api/data/zona',
     aktif: true,
-    opsi: { pane: 'pZona',
-            style: { color: '#1c8c8c', weight: 2, fillColor: '#1c8c8c', fillOpacity: 0.18 },
-            onEachFeature: function (f, layer) {
-              layer.bindPopup('<b>Zona Layanan ' + escapeHtml(f.properties.fid ?? '') + '</b>');
-            } }
+    opsi: {
+      pane: 'pZona',
+      style: { color: '#1c8c8c', weight: 2, fillColor: '#1c8c8c', fillOpacity: 0.18 },
+      onEachFeature: function (f, layer) {
+        layer.bindPopup('<b>Zona Layanan ' + escapeHtml(f.properties.fid ?? '') + '</b>');
+      }
+    }
   }
 ];
 
@@ -324,10 +285,6 @@ async function muatLayerPendukung() {
         '<span class="ly gagal">' + d.swatch + d.nama + ' <em>(belum ada)</em></span>');
     }
   });
-
-  document.getElementById('layer-info').textContent = gagal.length
-    ? 'Layer gagal dimuat: ' + gagal.join(', ')
-    : 'Semua layer pendukung dimuat';
 }
 
 // ---------- EVENT ----------
@@ -373,10 +330,10 @@ async function loadData() {
     sumber = 'Sumber data: API server';
   } catch (errApi) {
     try {
-      geojson = await fetchGeoJSON(DUMMY_URL);
-      sumber = 'Sumber data: file sementara (API belum tersedia)';
-    } catch (errDummy) {
-      console.error('Gagal memuat data:', errDummy);
+      geojson = await fetchGeoJSON(FALLBACK_URL);
+      sumber = 'Sumber data: GeoJSON lokal';
+    } catch (errFallback) {
+      console.error('Gagal memuat data:', errFallback);
       document.getElementById('info').textContent =
         'Data gagal dimuat. Jalankan lewat server, bukan file://';
       return;
@@ -384,7 +341,6 @@ async function loadData() {
   }
 
   allFeatures = geojson.features || [];
-  document.getElementById('source').textContent = sumber;
   hitungPerKategori();
   renderPosyandu();
 
